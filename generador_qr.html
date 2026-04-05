@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador QR Alta Resolución (Imprenta)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 450px;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-generate { background-color: #2563eb; color: white; }
+        .btn-download { background-color: #10b981; color: white; }
+        button:hover { opacity: 0.8; }
+        
+        #qrcode {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            background: #fff;
+            padding: 10px;
+        }
+        /* Forzamos que en pantalla se vea pequeño, aunque el archivo sea gigante */
+        #qrcode canvas, #qrcode img {
+            width: 250px !important;
+            height: 250px !important;
+        }
+        .info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Generador de QR (300 DPI)</h2>
+    <p>La imagen generada tendrá 1200px, ideal para impresión física.</p>
+    
+    <input type="text" id="urlInput" placeholder="https://tuweb.com" value="https://google.com">
+    
+    <div class="btn-group">
+        <button class="btn-generate" onclick="generar()">Actualizar</button>
+        <button class="btn-download" onclick="descargar()">Descargar PNG</button>
+    </div>
+
+    <div id="qrcode"></div>
+    <p class="info">Nota: Usa el nivel de corrección "H" (máxima resistencia).</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.4.10/dist/easy.qrcode.min.js"></script>
+
+<script>
+    var contenedor = document.getElementById("qrcode");
+    var qrcode;
+
+    function generar() {
+        var texto = document.getElementById("urlInput").value;
+        contenedor.innerHTML = ""; // Limpiar
+
+        qrcode = new QRCode(contenedor, {
+            text: texto,
+            width: 1200, // Resolución alta para imprenta
+            height: 1200,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+
+    function descargar() {
+        // Buscamos la imagen o el canvas generado
+        const img = contenedor.querySelector('img') || contenedor.querySelector('canvas');
+        if (!img) return;
+
+        let src = img.src;
+        if (img.tagName === 'CANVAS') {
+            src = img.toDataURL("image/png");
+        }
+
+        const link = document.createElement("a");
+        link.href = src;
+        link.download = "codigo-qr-imprenta.png";
+        link.click();
+    }
+
+    window.onload = generar;
+</script>
+
+</body>
+</html>
